@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<ruleset name="WP-ZAPP PHPCS Rules">
+	<description>PHPCS rules for WP-ZAPP.</description>
+
+	<rule ref="PSR2" />
+</ruleset>

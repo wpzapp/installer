@@ -1,0 +1,41 @@
+{
+  "name": "wpzapp/installer",
+  "description": "Composer plugin to install for WP-ZAPP modules and libraries.",
+  "version": "1.0.0",
+  "type": "composer-plugin",
+  "license": "GPL-3.0",
+  "keywords": [
+    "wpzapp",
+    "wordpress",
+    "installer"
+  ],
+  "homepage": "https://wpzapp.org",
+  "authors": [
+    {
+      "name": "Felix Arntz",
+      "email": "felix-arntz@leaves-and-love.net",
+      "homepage": "https://leaves-and-love.net",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/wpzapp/installer/issues"
+  },
+  "autoload": {
+    "psr-4": {
+      "WPZAPP\\Installer\\": "src"
+    }
+  },
+  "extra": {
+    "class": "WPZAPP\\Installer\\Plugin"
+  },
+  "require": {
+    "php": "^7.0",
+    "composer-plugin-api": "^1.0"
+  },
+  "require-dev": {
+    "composer/composer": "1.0.*@dev",
+    "phpunit/phpunit": "6.2.*",
+    "codeclimate/php-test-reporter": "dev-master"
+  }
+}
