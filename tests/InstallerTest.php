@@ -19,6 +19,7 @@ use Composer\Downloader\DownloadManager;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\IO\IOInterface;
 use PHPUnit\Framework\TestCase;
+use InvalidArgumentException;
 
 class InstallerTest extends TestCase
 {
@@ -47,10 +48,10 @@ class InstallerTest extends TestCase
         $this->config = new Config();
         $this->composer->setConfig($this->config);
 
-        $this->vendorDir = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'baton-test-vendor';
+        $this->vendorDir = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'wpzapp-test-vendor';
         $this->ensureDirectoryExistsAndClear($this->vendorDir);
 
-        $this->binDir = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'baton-test-bin';
+        $this->binDir = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'wpzapp-test-bin';
         $this->ensureDirectoryExistsAndClear($this->binDir);
 
         $this->config->merge(array(
@@ -81,12 +82,12 @@ class InstallerTest extends TestCase
      */
     public function testGetInstallPath(string $type, string $name, string $path)
     {
-        $installer = new Installer($this->io, $this->composer);
         $package = new Package($name, '1.0.0', '1.0.0');
-
         $package->setType($type);
-        $result = $installer->getInstallPath($package);
 
+        $installer = new Installer($this->io, $this->composer);
+
+        $result = $installer->getInstallPath($package);
         $this->assertSame($path, $result);
     }
 
@@ -95,7 +96,78 @@ class InstallerTest extends TestCase
         return array(
             array('wpzapp-lib', 'wpzapp/my-library', 'wp-content/mu-plugins/wpzapp-lib/my-library/'),
             array('wpzapp-module', 'wpzapp/my-module', 'wp-content/mu-plugins/wpzapp-modules/my-module/'),
+            array('wpzapp-module', 'no-vendor-module', 'wp-content/mu-plugins/wpzapp-modules/no-vendor-module/'),
         );
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testGetInstallPathInvalidType()
+    {
+        $package = new Package('wpzapp/invalid', '1.0.0', '1.0.0');
+        $package->setType('invalid-lib');
+
+        $installer = new Installer($this->io, $this->composer);
+
+        $result = $installer->getInstallPath($package);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testGetInstallPathInvalidSubtype()
+    {
+        $package = new Package('wpzapp/invalid', '1.0.0', '1.0.0');
+        $package->setType('wpzapp-invalid');
+
+        $installer = new Installer($this->io, $this->composer);
+
+        $result = $installer->getInstallPath($package);
+    }
+
+    public function testGetInstallPathCustomType()
+    {
+        $package = new Package('wpzapp/my-module', '1.0.0', '1.0.0');
+        $package->setType('wpzapp-module');
+
+        $installer = new Installer($this->io, $this->composer);
+
+        $consumerPackage = new RootPackage('foo/bar', '1.0.0', '1.0.0');
+        $consumerPackage->setExtra(array(
+            'installer-paths' => array(
+                'web/app/mu-plugins/wpzapp-modules/{$name}/' => array(
+                    'type:wpzapp-module'
+                ),
+            ),
+        ));
+
+        $this->composer->setPackage($consumerPackage);
+
+        $result = $installer->getInstallPath($package);
+        $this->assertEquals('web/app/mu-plugins/wpzapp-modules/my-module/', $result);
+    }
+
+    public function testGetInstallPathCustomVendor()
+    {
+        $package = new Package('custom-vendor/my-module', '1.0.0', '1.0.0');
+        $package->setType('wpzapp-module');
+
+        $installer = new Installer($this->io, $this->composer);
+
+        $consumerPackage = new RootPackage('foo/bar', '1.0.0', '1.0.0');
+        $consumerPackage->setExtra(array(
+            'installer-paths' => array(
+                'wp-content/mu-plugins/wpzapp-custom-vendor-modules/{$name}/' => array(
+                    'vendor:custom-vendor'
+                ),
+            ),
+        ));
+
+        $this->composer->setPackage($consumerPackage);
+
+        $result = $installer->getInstallPath($package);
+        $this->assertEquals('wp-content/mu-plugins/wpzapp-custom-vendor-modules/my-module/', $result);
     }
 
     /**
@@ -117,6 +189,49 @@ class InstallerTest extends TestCase
             array('another-module', false),
             array('something-else', false),
         );
+    }
+
+    public function testUninstall()
+    {
+        $package = new Package('foo', '1.0.0', '1.0.0');
+
+        $installer = $this->getMockBuilder(Installer::class)
+            ->setMethods(array('getInstallPath'))
+            ->setConstructorArgs(array($this->io, $this->composer))
+            ->getMock();
+        $installer->expects($this->once())
+            ->method('getInstallPath')
+            ->with($package)
+            ->will($this->returnValue(sys_get_temp_dir().'/foo/'));
+
+        $repo = $this->createMock(InstalledRepositoryInterface::class);
+        $repo->expects($this->once())
+            ->method('hasPackage')
+            ->with($package)
+            ->will($this->returnValue(true));
+        $repo->expects($this->once())
+            ->method('removePackage')
+            ->with($package);
+
+        $installer->uninstall($repo, $package);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testUninstallMissingPackage()
+    {
+        $package = new Package('foo', '1.0.0', '1.0.0');
+
+        $installer = new Installer($this->io, $this->composer);
+
+        $repo = $this->createMock(InstalledRepositoryInterface::class);
+        $repo->expects($this->once())
+            ->method('hasPackage')
+            ->with($package)
+            ->will($this->returnValue(false));
+
+        $installer->uninstall($repo, $package);
     }
 
     protected function ensureDirectoryExistsAndClear(string $directory)

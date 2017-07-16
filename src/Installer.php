@@ -13,6 +13,7 @@ use Composer\IO\IOInterface;
 use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
+use InvalidArgumentException;
 
 /**
  * Installer class.
@@ -42,7 +43,7 @@ class Installer extends LibraryInstaller
     {
         $type = $package->getType();
         if (substr($type, 0, strlen(self::NAME)) !== self::NAME) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Sorry the package type of this package is not yet supported.'
             );
         }
@@ -76,7 +77,7 @@ class Installer extends LibraryInstaller
 
         $locations = self::LOCATIONS;
         if (!isset($locations[$subPackageType])) {
-            throw new \InvalidArgumentException(sprintf('Sub-package type "%s" is not supported', $type));
+            throw new InvalidArgumentException(sprintf('Sub-package type "%s" is not supported', $type));
         }
 
         return $this->templatePath($locations[$subPackageType], $availableVars);
@@ -90,7 +91,7 @@ class Installer extends LibraryInstaller
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         if (!$repo->hasPackage($package)) {
-            throw new \InvalidArgumentException('Package is not installed: ' . $package);
+            throw new InvalidArgumentException('Package is not installed: ' . $package);
         }
 
         $repo->removePackage($package);
