@@ -119,7 +119,7 @@ class Installer extends LibraryInstaller
 
         $locationPattern = $this->getLocationPattern();
 
-        return preg_match('#' . self::NAME . '-' . $locationPattern . '#', $packageType, $matches) === 1;
+        return preg_match('#' . self::NAME . '-' . $locationPattern . '#', $packageType) === 1;
     }
 
     /**

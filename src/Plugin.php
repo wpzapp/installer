@@ -27,8 +27,6 @@ class Plugin implements PluginInterface
      * {@inheritDoc}
      *
      * @since 1.0.0
-     *
-     * @codeCoverageIgnore
      */
     public function activate(Composer $composer, IOInterface $io)
     {

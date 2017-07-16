@@ -26,15 +26,9 @@ class InstallerTest extends TestCase
 
     private $composer;
 
-    private $config;
-
     private $vendorDir;
 
     private $binDir;
-
-    private $dm;
-
-    private $repository;
 
     private $io;
 
@@ -42,11 +36,7 @@ class InstallerTest extends TestCase
 
     public function setUp()
     {
-        $this->fs = new Filesystem;
-
         $this->composer = new Composer();
-        $this->config = new Config();
-        $this->composer->setConfig($this->config);
 
         $this->vendorDir = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'wpzapp-test-vendor';
         $this->ensureDirectoryExistsAndClear($this->vendorDir);
@@ -54,27 +44,29 @@ class InstallerTest extends TestCase
         $this->binDir = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'wpzapp-test-bin';
         $this->ensureDirectoryExistsAndClear($this->binDir);
 
-        $this->config->merge(array(
+        $config = new Config();
+        $this->composer->setConfig($config);
+        $config->merge(array(
             'config' => array(
                 'vendor-dir' => $this->vendorDir,
                 'bin-dir'    => $this->binDir,
             ),
         ));
 
-        $this->dm = $this->getMockBuilder(DownloadManager::class)
+        $dm = $this->getMockBuilder(DownloadManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->composer->setDownloadManager($this->dm);
+        $this->composer->setDownloadManager($dm);
 
-        $this->repository = $this->createMock(InstalledRepositoryInterface::class);
         $this->io = $this->createMock(IOInterface::class);
     }
 
     public function tearDown()
     {
-        $this->fs->removeDirectory($this->vendorDir);
-        $this->fs->removeDirectory($this->binDir);
+        $fs = new Filesystem;
+        $fs->removeDirectory($this->vendorDir);
+        $fs->removeDirectory($this->binDir);
     }
 
     /**
