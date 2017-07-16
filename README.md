@@ -4,6 +4,6 @@
 [![Latest Stable Version](https://poser.pugx.org/wpzapp/installer/version)](https://packagist.org/packages/wpzapp/installer)
 [![License](https://poser.pugx.org/wpzapp/installer/license)](https://packagist.org/packages/wpzapp/installer)
 
-# WP-ZAPP: Module Core
+# WP-ZAPP: Installer
 
 Composer plugin to install for WP-ZAPP modules and libraries.
