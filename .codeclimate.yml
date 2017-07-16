@@ -1,33 +1,27 @@
 ---
 engines:
-  csslint:
-    enabled: true
   duplication:
     enabled: true
     config:
       languages:
       - php
-      - javascript
-  eslint:
-    enabled: true
   fixme:
     enabled: true
   phpcodesniffer:
     enabled: true
     config:
+      file_extensions: "php"
       standard: "phpcs.xml"
       ignore_warnings: true
       encoding: utf-8
   phpmd:
     enabled: true
     config:
+      file_extensions: "php"
       rulesets: "phpmd.xml"
 ratings:
   paths:
-  - "**.php"
-  - "**.js"
+  - "src/**.php"
 exclude_paths:
-- "gulpfile.js"
-- "vendor/*"
-- "node_modules/*"
 - "tests/*"
+- "vendor/*"

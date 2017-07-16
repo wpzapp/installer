@@ -7,7 +7,7 @@
  * @link    https://wpzapp.org
  */
 
-namespace Composer\Installers;
+namespace WPZAPP\Installer;
 
 use Composer\IO\IOInterface;
 use Composer\Installer\LibraryInstaller;
@@ -24,14 +24,10 @@ use Composer\Repository\InstalledRepositoryInterface;
 class Installer extends LibraryInstaller
 {
 
-    /**
-     * @var string Package type identifier.
-     */
+    /** @var string Package type identifier. */
     const NAME = 'wpzapp';
 
-    /**
-     * @var array Associative array of subpackage types and their locations.
-     */
+    /** @var array Associative array of subpackage types and their locations. */
     const LOCATIONS = array(
         'lib'    => 'wp-content/mu-plugins/wpzapp-lib/{$name}/',
         'module' => 'wp-content/mu-plugins/wpzapp-modules/{$name}/'
@@ -132,6 +128,7 @@ class Installer extends LibraryInstaller
      *
      * @param string $path Path to replace variables in.
      * @param array  $vars Associative array of variable names and their values.
+     *
      * @return string Path with placeholders replaced with values.
      */
     protected function templatePath(string $path, array $vars = array()): string

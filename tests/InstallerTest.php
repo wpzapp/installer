@@ -20,7 +20,8 @@ use Composer\Repository\InstalledRepositoryInterface;
 use Composer\IO\IOInterface;
 use PHPUnit\Framework\TestCase;
 
-class InstallerTest extends TestCase {
+class InstallerTest extends TestCase
+{
 
     private $composer;
 
@@ -65,8 +66,8 @@ class InstallerTest extends TestCase {
 
         $this->composer->setDownloadManager($this->dm);
 
-        $this->repository = $this->getMock(InstalledRepositoryInterface::class);
-        $this->io = $this->getMock(IOInterface::class);
+        $this->repository = $this->createMock(InstalledRepositoryInterface::class);
+        $this->io = $this->createMock(IOInterface::class);
     }
 
     public function tearDown()
