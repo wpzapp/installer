@@ -118,6 +118,20 @@ class InstallerTest extends TestCase
         $result = $installer->getInstallPath($package);
     }
 
+    public function testGetInstallPathCustomInstallerName()
+    {
+        $package = new Package('wpzapp/my-module', '1.0.0', '1.0.0');
+        $package->setType('wpzapp-module');
+        $package->setExtra(array(
+            'installer-name' => 'custom-module',
+        ));
+
+        $installer = new Installer($this->io, $this->composer);
+
+        $result = $installer->getInstallPath($package);
+        $this->assertEquals('wp-content/mu-plugins/wpzapp-modules/custom-module/', $result);
+    }
+
     public function testGetInstallPathCustomType()
     {
         $package = new Package('wpzapp/my-module', '1.0.0', '1.0.0');
@@ -160,6 +174,29 @@ class InstallerTest extends TestCase
 
         $result = $installer->getInstallPath($package);
         $this->assertEquals('wp-content/mu-plugins/wpzapp-custom-vendor-modules/my-module/', $result);
+    }
+
+    public function testGetInstallPathCustomInvalid()
+    {
+        $package = new Package('wpzapp/my-module', '1.0.0', '1.0.0');
+        $package->setType('wpzapp-module');
+
+        $installer = new Installer($this->io, $this->composer);
+
+        // Invalid installer paths will be ignored.
+        $consumerPackage = new RootPackage('foo/bar', '1.0.0', '1.0.0');
+        $consumerPackage->setExtra(array(
+            'installer-paths' => array(
+                'wp-content/mu-plugins/wpzapp-custom-vendor-modules/{$name}/' => array(
+                    'invalid:whatever'
+                ),
+            ),
+        ));
+
+        $this->composer->setPackage($consumerPackage);
+
+        $result = $installer->getInstallPath($package);
+        $this->assertEquals('wp-content/mu-plugins/wpzapp-modules/my-module/', $result);
     }
 
     /**
