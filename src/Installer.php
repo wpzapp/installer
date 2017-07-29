@@ -169,6 +169,7 @@ class Installer extends LibraryInstaller
      * @param string $name   Vendor and package name of the current package.
      * @param string $type   Package type of the current package.
      * @param string $vendor Optional. Vendor name of the current package. Default empty string.
+     *
      * @return string Custom installation path, or empty string if no match found.
      */
     protected function mapCustomInstallPaths(array $paths, string $name, string $type, string $vendor = ''): string
